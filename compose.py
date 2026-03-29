@@ -32,7 +32,7 @@ VERB_SIZE_MIN = 150
 DESC_SIZE = 124
 VERB_DESC_GAP = 20
 DESC_LINE_GAP = 24
-MAX_TEXT_W = int(CANVAS_W * 0.75)
+MAX_TEXT_W = int(CANVAS_W * 0.92)
 MAX_VERB_W = int(CANVAS_W * 0.92)
 
 FONT_PATH = "/Library/Fonts/SF-Pro-Display-Black.otf"
