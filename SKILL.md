@@ -530,7 +530,7 @@ SKILL_DIR="$HOME/.claude/skills/aso-appstore-screenshots"
 
 python3 "$SKILL_DIR/showcase.py" \
   --screenshots screenshots/final/01-*.png screenshots/final/02-*.png screenshots/final/03-*.png \
-  --github "github.com/adamlyttleapps/claude-skill-aso-appstore-screenshots" \
+  --github "github.com/adamlyttleapps" \
   --output screenshots/showcase.png
 ```
 
