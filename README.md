@@ -33,10 +33,10 @@ The skill uses **SF Pro Display Black** for headline text. On macOS, install it 
 
 ### 4. Set up Gemini MCP (for AI enhancement)
 
-The generation phase requires [gemini-mcp](https://github.com/houtini/gemini-mcp) to be configured as an MCP server in Claude Code:
+The generation phase requires [@houtini/gemini-mcp](https://www.npmjs.com/package/@houtini/gemini-mcp) to be configured as an MCP server in Claude Code:
 
 ```bash
-npm install -g gemini-mcp
+npm install -g @houtini/gemini-mcp
 ```
 
 Then add it to your Claude Code MCP config (`~/.claude/settings.json` or project `.mcp.json`).
