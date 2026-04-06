@@ -58,6 +58,24 @@ DEVICE_PROFILES = {
         "text_top": 163,
         "frame_file": "device_frame_android.png",
     },
+    "ipad-12.9": {
+        "canvas": (2048, 2732),
+        "device_w": 1536,
+        "bezel": 20,
+        "screen_corner_r": 20,
+        "device_y": 700,
+        "text_top": 180,
+        "frame_file": "device_frame_ipad.png",
+    },
+    "ipad-11": {
+        "canvas": (1668, 2388),
+        "device_w": 1252,
+        "bezel": 16,
+        "screen_corner_r": 16,
+        "device_y": 612,
+        "text_top": 157,
+        "frame_file": "device_frame_ipad.png",
+    },
 }
 
 # ── Typography (proportional to canvas width) ───────────────────────
@@ -198,6 +216,19 @@ def compose(bg_hex, verb, desc, screenshot_path, output_path, device="iphone-6.7
     print(f"✓ {output_path} ({canvas_w}×{canvas_h}) [{device}]")
 
 
+def parse_devices(value):
+    """Parse comma-separated device list or 'all'."""
+    if value == "all":
+        return list(DEVICE_PROFILES.keys())
+    devices = [d.strip() for d in value.split(",")]
+    for d in devices:
+        if d not in DEVICE_PROFILES:
+            raise argparse.ArgumentTypeError(
+                f"Unknown device '{d}'. Choose from: {', '.join(DEVICE_PROFILES.keys())}, all"
+            )
+    return devices
+
+
 def main():
     p = argparse.ArgumentParser(description="Compose store screenshot")
     p.add_argument("--bg", required=True, help="Background hex colour (#E31837)")
@@ -207,13 +238,21 @@ def main():
     p.add_argument("--output", required=True, help="Output file path")
     p.add_argument(
         "--device",
-        choices=list(DEVICE_PROFILES.keys()),
+        type=parse_devices,
         default="iphone-6.7",
-        help="Device profile (default: iphone-6.7)",
+        help="Device profile(s), comma-separated or 'all' (default: iphone-6.7)",
     )
     args = p.parse_args()
 
-    compose(args.bg, args.verb, args.desc, args.screenshot, args.output, device=args.device)
+    devices = args.device if isinstance(args.device, list) else [args.device]
+
+    if len(devices) == 1:
+        compose(args.bg, args.verb, args.desc, args.screenshot, args.output, device=devices[0])
+    else:
+        base, ext = os.path.splitext(args.output)
+        for device in devices:
+            out = f"{base}-{device}{ext}"
+            compose(args.bg, args.verb, args.desc, args.screenshot, out, device=device)
 
 
 if __name__ == "__main__":

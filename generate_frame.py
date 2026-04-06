@@ -37,6 +37,16 @@ ANDROID_SCREEN_CORNER_R = 44
 ANDROID_PUNCH_HOLE_R = 14       # punch-hole camera radius
 ANDROID_PUNCH_HOLE_TOP = 16     # offset from top of screen
 
+# ── iPad dimensions ─────────────────────────────────────────────────
+# Sized for 2048×2732 App Store canvas (~75% width)
+IPAD_W = 1536
+IPAD_H = 2400
+IPAD_CORNER_R = 36
+IPAD_BEZEL = 20
+IPAD_SCREEN_CORNER_R = 20
+IPAD_CAMERA_R = 8               # front camera radius
+IPAD_CAMERA_TOP = 10            # offset from top of bezel
+
 
 def generate_iphone():
     device_w, device_h = IPHONE_W, IPHONE_H
@@ -148,11 +158,68 @@ def generate_android():
     print(f"  SCREEN_CORNER_R={ANDROID_SCREEN_CORNER_R}")
 
 
+def generate_ipad():
+    device_w, device_h = IPAD_W, IPAD_H
+    bezel = IPAD_BEZEL
+    screen_w = device_w - 2 * bezel
+    screen_h = device_h - 2 * bezel
+
+    frame = Image.new("RGBA", (device_w, device_h), (0, 0, 0, 0))
+    fd = ImageDraw.Draw(frame)
+
+    # ── Device body (dark grey outer, darker inner) ─────────────────
+    fd.rounded_rectangle(
+        [0, 0, device_w - 1, device_h - 1],
+        radius=IPAD_CORNER_R,
+        fill=(30, 30, 30, 255),
+    )
+    fd.rounded_rectangle(
+        [1, 1, device_w - 2, device_h - 2],
+        radius=IPAD_CORNER_R - 1,
+        fill=(20, 20, 20, 255),
+    )
+
+    # ── Screen cutout (transparent) ─────────────────────────────────
+    screen_x, screen_y = bezel, bezel
+    cutout = Image.new("L", (device_w, device_h), 255)
+    ImageDraw.Draw(cutout).rounded_rectangle(
+        [screen_x, screen_y, screen_x + screen_w, screen_y + screen_h],
+        radius=IPAD_SCREEN_CORNER_R,
+        fill=0,
+    )
+    frame.putalpha(ImageChops.multiply(frame.getchannel("A"), cutout))
+
+    # ── Front camera (centered, top bezel) ──────────────────────────
+    cam_x = device_w // 2
+    cam_y = IPAD_CAMERA_TOP + IPAD_CAMERA_R
+    ImageDraw.Draw(frame).ellipse(
+        [cam_x - IPAD_CAMERA_R, cam_y - IPAD_CAMERA_R,
+         cam_x + IPAD_CAMERA_R, cam_y + IPAD_CAMERA_R],
+        fill=(15, 15, 15, 255),
+    )
+
+    # ── Side buttons ────────────────────────────────────────────────
+    btn_color = (25, 25, 25, 255)
+    fd2 = ImageDraw.Draw(frame)
+    # Power button (top right)
+    fd2.rounded_rectangle([device_w, 80, device_w + 3, 160], radius=2, fill=btn_color)
+    # Volume up (right side)
+    fd2.rounded_rectangle([device_w, 220, device_w + 3, 300], radius=2, fill=btn_color)
+    # Volume down (right side)
+    fd2.rounded_rectangle([device_w, 320, device_w + 3, 400], radius=2, fill=btn_color)
+
+    out = os.path.join(ASSETS_DIR, "device_frame_ipad.png")
+    frame.save(out, "PNG")
+    print(f"✓ {out} ({device_w}×{device_h})")
+    print(f"  BEZEL={bezel}, SCREEN_W={screen_w}, SCREEN_H={screen_h}")
+    print(f"  SCREEN_CORNER_R={IPAD_SCREEN_CORNER_R}")
+
+
 def main():
     p = argparse.ArgumentParser(description="Generate device frame template")
     p.add_argument(
         "--device",
-        choices=["iphone", "android", "all"],
+        choices=["iphone", "android", "ipad", "all"],
         default="iphone",
         help="Which device frame to generate (default: iphone)",
     )
@@ -164,6 +231,8 @@ def main():
         generate_iphone()
     if args.device in ("android", "all"):
         generate_android()
+    if args.device in ("ipad", "all"):
+        generate_ipad()
 
 
 if __name__ == "__main__":

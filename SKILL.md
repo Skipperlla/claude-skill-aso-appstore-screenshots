@@ -246,8 +246,10 @@ App Store Connect is **very strict** about image dimensions — it will reject s
 | iPhone 6.5" | 1242 x 2688px | 2688 x 1242px | `iphone-6.5` |
 | iPhone 6.7" | 1290 x 2796px | 2796 x 1290px | `iphone-6.7` |
 | iPhone 6.9" | 1320 x 2868px | 2868 x 1320px | `iphone-6.9` |
+| iPad Pro 12.9" | 2048 x 2732px | 2732 x 2048px | `ipad-12.9` |
+| iPad Pro 11" | 1668 x 2388px | 2388 x 1668px | `ipad-11` |
 
-Default to **1290 x 2796px** (iPhone 6.7") unless the user specifies otherwise. Up to 10 screenshots per display size.
+Default to **1290 x 2796px** (iPhone 6.7") for phones and **2048 x 2732px** (iPad Pro 12.9") for tablets unless the user specifies otherwise. Up to 10 screenshots per display size.
 
 **IMPORTANT — Aspect ratio mismatch**: Apple's required dimensions are narrower than standard 9:16 (~0.461 ratio vs 0.5625). Nano Banana generates at preset aspect ratios, so we generate **wider than needed** at 9:16 with 4K resolution, then **crop and resize** down to exact Apple dimensions in a post-processing step (see Step 4 below). This approach avoids stretching — we remove excess width instead.
 
@@ -275,8 +277,8 @@ Each screenshot follows this exact high-converting ASO format. **Consistency acr
 - **Horizontal safe area (CRITICAL)**: All text MUST stay well within the centre ~70% of the canvas width. Leave generous horizontal margins on both sides — at least 15% padding from each edge. This is essential because the post-processing step crops the sides of the image to convert from 9:16 to Apple's narrower aspect ratio. Any text near the left or right edges WILL be cut off. Keep headlines short enough to fit comfortably within this safe zone. If a headline is too long, break it across more lines rather than extending to the edges.
 
 **Device frame**:
-- A modern iPhone device mockup (black frame, dynamic island)
-- The device displays the paired simulator screenshot
+- A modern device mockup matching the target platform — iPhone (Dynamic Island), iPad (slim bezels), or Android (punch-hole camera)
+- The device displays the paired simulator/emulator screenshot
 - The device is **positioned high on the canvas** — it overlaps or sits just below the headline text area, NOT pushed down to the bottom
 - The bottom of the device **bleeds off the bottom edge** of the canvas — the phone is intentionally cropped, not fully visible. This creates a dynamic, modern feel.
 - The device is centered horizontally
@@ -336,8 +338,10 @@ python3 "$SKILL_DIR/compose.py" \
 ```
 
 Set `DEVICE` to the appropriate profile:
-- iOS: `iphone-6.7` (default), `iphone-6.5`, or `iphone-6.9`
+- iPhone: `iphone-6.7` (default), `iphone-6.5`, or `iphone-6.9`
+- iPad: `ipad-12.9` or `ipad-11`
 - Android: `android`
+- Multiple: `iphone-6.7,android` (comma-separated) or `all` for every profile
 
 This outputs pixel-perfect 1290×2796 PNGs with:
 - Bold white headline text (verb auto-sized to fit canvas width)
@@ -375,7 +379,7 @@ KEEP EXACTLY AS-IS:
 - The background colour
 
 ENHANCE AND POLISH:
-- Replace the placeholder device frame with a photorealistic device mockup — for iOS use an iPhone 15 Pro, for Android use a Google Pixel 8 Pro — sleek, modern, with accurate proportions, reflections, and subtle shadows. The phone should look like a real device, not a flat rectangle. Keep the same position and size as the scaffold.
+- Replace the placeholder device frame with a photorealistic device mockup — for iPhone use an iPhone 15 Pro, for iPad use an iPad Pro, for Android use a Google Pixel 8 Pro — sleek, modern, with accurate proportions, reflections, and subtle shadows. The device should look real, not a flat rectangle. Keep the same position and size as the scaffold.
 - Refine the overall visual quality to look like a professional, high-budget App Store screenshot
 - OPTIONALLY add a PRIMARY breakout element — but ONLY if there is an obvious, visually compelling UI panel on the app screen that directly relates to the benefit headline. If nothing on screen clearly reinforces the headline, skip the breakout entirely — a clean screenshot with no breakout is better than a forced one. When you DO add a breakout, it MUST be an entire UI panel or grouped section (e.g., a complete card with its title and content, a full list section, a complete dialog/sheet) — never individual small elements like a single button, icon, or colour dot. IMPORTANT: The panel must stay at the SAME vertical position and orientation as where it appears on screen — do NOT rotate or angle it. The panel must be SCALED UP significantly — rendered much larger than it appears on the phone screen — so that it extends dramatically beyond BOTH left and right edges of the device frame, clearly overlapping the phone bezel on both sides, expanding to nearly the full width of the screenshot canvas. Do NOT keep the panel at its original on-screen size with just padding added around it. The panel itself must be enlarged. It should appear to float in front of the device at this larger scale — add a soft drop shadow beneath it to create depth and sell the hovering effect. The panel must look like it came from the app — same colours, same style, same content. Do NOT invent new elements.
 [PRIMARY BREAKOUT — if a relevant panel is obvious, describe the specific UI panel visible on screen and instruct it to extend beyond both edges of the device frame with a drop shadow, e.g., "The [panel name] card/row extends beyond both left and right edges of the device frame, overlapping the phone bezel on both sides, expanding to nearly the full screenshot width. It floats in front of the device with a soft drop shadow beneath it." If no panel clearly relates to the headline, write "No breakout — the app screen speaks for itself."]
@@ -448,6 +452,8 @@ Target dimensions per display size — adjust `TARGET_W` and `TARGET_H`:
 - iPhone 6.5": `TARGET_W=1242 TARGET_H=2688`
 - iPhone 6.7" (default): `TARGET_W=1290 TARGET_H=2796`
 - iPhone 6.9": `TARGET_W=1320 TARGET_H=2868`
+- iPad Pro 12.9": `TARGET_W=2048 TARGET_H=2732`
+- iPad Pro 11": `TARGET_W=1668 TARGET_H=2388`
 - Android Phone: `TARGET_W=1080 TARGET_H=2400`
 
 **Step 4: Review all 3 versions with the user**
